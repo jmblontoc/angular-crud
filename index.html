@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html ng-app="pokemon-app">
+    <head>
+        <title>Angular CRUD</title>
+
+        <!-- Bootstrap CSS -->
+        <link 
+            rel="stylesheet" 
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+            crossorigin="anonymous" />
+
+        <!-- Font Awesome -->
+        <link 
+            rel="stylesheet" 
+            href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" 
+            integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" 
+            crossorigin="anonymous" />
+
+        <!-- Bootstrap Scripts -->
+        <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+        <script 
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+            crossorigin="anonymous"></script>
+
+        <!-- Angular CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
+
+        <!-- Main Script -->
+        <script src="js/main.js"></script>
+
+        <!-- Internal Styles -->
+        <style>
+            button.action-btn { width: 75px }
+            .hidden { display: none }
+        </style>
+
+    </head>
+
+    <body>
+        <div class="container" ng-controller="pokemon-controller">
+            <h1>Pokemon Mini App</h1>
+            <h5><em>Angular CRUD</em></h5>
+            <div class="col-12 mt-4">
+                <div>
+                    <button 
+                        class="btn btn-primary btn-sm mb-1" 
+                        data-toggle="modal" 
+                        data-target="#add-pokemon-modal"
+                        ng-click="initAddModal()">
+                        <i class="far fa-plus-square mr-2"></i>
+                        Add
+                    </button>
+                </div>
+                <p ng-show="pokemons.length === 0">There are no Pokemon</p>
+                <table class="table table-striped" ng-show="pokemons.length > 0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th colspan="2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="pokemon in pokemons" data-id="{{ pokemon.id }}">
+                            <td style="width: 50%">{{ pokemon.name }}</td>
+                            <td style="width: 35%">{{ pokemon.type }}</td>
+                            <td>
+                                <button 
+                                    class="btn btn-primary btn-sm action-btn"
+                                    data-toggle="modal"
+                                    data-target="#edit-pokemon-modal"
+                                    ng-click="initEditModal($event)">
+                                    <i class="far fa-edit"></i>
+                                    Edit
+                                </button>
+                            </td>
+                            <td>
+                                <button 
+                                    class="btn btn-danger btn-sm action-btn"
+                                    data-toggle="modal"
+                                    data-target="#delete-pokemon-modal"
+                                    ng-click="initDeleteModal($event)">
+                                    <i class="far fa-trash-alt"></i>
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Modal -->
+            <div class="modal fade" id="add-pokemon-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Pokemon</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-danger hidden error-msg">{{ errorMsg }}</p>
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input ng-model="name" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                    <label>Type</label>
+                                    <select class="form-control" 
+                                            id="pokemon-type" 
+                                            ng-options="type for type in types" 
+                                            ng-model="selectedType">
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    id="submit-pokemon"
+                                    ng-click="addPokemon()">
+                                    Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="edit-pokemon-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Pokemon</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-danger hidden error-msg">{{ errorMsg }}</p>
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input ng-model="nameEdit" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                    <label>Type</label>
+                                    <select class="form-control" 
+                                            id="pokemon-type-edit" 
+                                            ng-options="type for type in types" 
+                                            ng-model="selectedTypeEdit">
+                                    </select>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    id="edit-pokemon"
+                                    ng-click="editPokemon($event)">
+                                    Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="delete-pokemon-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p class="modal-title">Are you sure you want to delete {{ selectedPokemon }} ?</p>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                            <button 
+                                type="button" 
+                                class="btn btn-danger" 
+                                id="confirm-delete-btn"
+                                ng-click="deletePokemon($event)">
+                                Yes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
